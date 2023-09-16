@@ -29,7 +29,6 @@ function bigparsing() {
 
 
     if (value.id === Number(searchId)) {
-      console.log(value.name);
       isDataFound = true;
       stream.destroy(); // Kill the stream when one result match
     }
