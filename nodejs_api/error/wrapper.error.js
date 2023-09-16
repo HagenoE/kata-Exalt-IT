@@ -1,4 +1,4 @@
-export default errorWrapper = (callback) = async (req, res, next) => {
+export default (callback) => async (req, res, next) => {
   try {
     await callback(req, res, next)
   } catch (error) {

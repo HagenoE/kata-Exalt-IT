@@ -1,8 +1,19 @@
 const errorHandler = (err, req, res, next) => {
-  const status = err.status ?? 500;
-  const message = err.message;
+  let message = err.message;
+  let status = err.status ?? 500;
+  if (err.name === 'CastError') {
+    message = 'No match found'
+    status = 404
+  }
+  if (err.name === 'MongoError') {
+    message = "An issue is running, please wait "
+  }
+  if (err.name === 'ValidationError') {
+    message = "Validation error";
+  }
 
-  res.stauts(status).json({ error: message })
+
+  return res.status(status).json({ message })
 
 }
 export default errorHandler;
