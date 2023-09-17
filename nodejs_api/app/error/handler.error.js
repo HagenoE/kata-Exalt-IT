@@ -39,6 +39,11 @@ const handleValidationError = (res, err) => {
   return res.status(400).json({ message });
 };
 
+const handleTokenError = (res) => {
+  const message = 'Invalide connexion.Please reconnect ';
+  return res.status(401).json({ message });
+};
+
 /**
  * Handles errors that occur in the application.
  *
@@ -52,7 +57,6 @@ const handleValidationError = (res, err) => {
 const errorHandler = (err, req, res) => {
   const { message } = err;
   const status = err.status ?? 500;
-
   if (err.name === 'CastError') {
     handleCastError(res, err);
   }
@@ -62,6 +66,10 @@ const errorHandler = (err, req, res) => {
 
   if (err.name === 'ValidationError') {
     handleValidationError(res, err);
+  }
+
+  if (err.name === 'JsonWebTokenError') {
+    handleTokenError(res);
   }
 
   return res.status(status).json({ message });

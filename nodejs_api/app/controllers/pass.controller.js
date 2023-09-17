@@ -22,7 +22,7 @@ const passController = {
  * @param {Object} res - The response object.
  * @return {Object} Returns the pass record.
  */
-  async addPass(req, res, next) {
+  async addPass(req, res) {
     const { passLevel } = req.body;
 
     const newPass = {
@@ -31,10 +31,6 @@ const passController = {
 
     const passRecord = new Pass(newPass);
     await passRecord.save();
-
-    if (!passLevel) {
-      return next(new AppError(500, 'must have a pass level2'));
-    }
 
     return res.status(201).json({ data: passRecord });
   },
@@ -87,7 +83,7 @@ const passController = {
       return next(new AppError(404, 'No match found'));
     }
 
-    return res.status(204).json({ message: 'Pass deleted' });
+    return res.sendStatus(204);
   },
 };
 

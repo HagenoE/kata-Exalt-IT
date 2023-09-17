@@ -38,14 +38,13 @@ const placeController = {
   },
   deletePlace: async (req, res, next) => {
     const { id } = req.params;
-    console.log(id);
+
     const place = await Place.findByIdAndRemove(id);
-    console.log(!place);
     if (!place) {
       return next(new AppError(404, 'No place found'));
     }
 
-    return res.status(204).json({ message: 'Place deleted' });
+    return res.sendStatus(204);
   },
 
 };
