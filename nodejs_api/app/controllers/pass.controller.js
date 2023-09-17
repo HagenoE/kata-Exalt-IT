@@ -1,5 +1,5 @@
-import AppError from "../error/app.error.js";
-import Pass from "../models/pass.model.js";
+import AppError from '../error/app.error.js';
+import Pass from '../models/pass.model.js';
 
 const passController = {
   /**
@@ -9,10 +9,10 @@ const passController = {
    * @param {Object} res - the response object
    * @return {Object} - the response object with the data property containing all passes
    */
-  async getAll(req, res) {
+  async getAllPass(req, res) {
     const getAllPass = await Pass.find();
 
-    return res.status(200).json({ data: getAllPass })
+    return res.status(200).json({ data: getAllPass });
   },
 
   /**
@@ -22,14 +22,21 @@ const passController = {
  * @param {Object} res - The response object.
  * @return {Object} Returns the pass record.
  */
-  addPass(req, res) {
+  async addPass(req, res, next) {
     const { passLevel } = req.body;
+
     const newPass = {
-      passLevel
-    }
+      passLevel,
+    };
+
     const passRecord = new Pass(newPass);
-    passRecord.save();
-    return res.status(201).json({ data: passRecord })
+    await passRecord.save();
+
+    if (!passLevel) {
+      return next(new AppError(500, 'must have a pass level2'));
+    }
+
+    return res.status(201).json({ data: passRecord });
   },
 
   /**
@@ -62,14 +69,15 @@ const passController = {
   async updatePass(req, res, next) {
     const { id } = req.params;
     req.body.updatedAt = Date.now();
-    const pass = await Pass.findByIdAndUpdate(id, req.body);
-    const updatedPass = await Pass.findById(id);
+    const oldPass = await Pass.findByIdAndUpdate(id, req.body);
 
-    if (!pass) {
+    if (!oldPass) {
       return next(new AppError(404, 'No match found'));
     }
-    console.log(pass)
-    return res.status(201).json({ data: updatedPass })
+
+    const updatedPass = await Pass.findById(id);
+
+    return res.status(201).json({ data: updatedPass });
   },
   async deletePass(req, res, next) {
     const { id } = req.params;
@@ -79,8 +87,8 @@ const passController = {
       return next(new AppError(404, 'No match found'));
     }
 
-    return res.status(204)
-  }
-}
+    return res.status(204).json({ message: 'Pass deleted' });
+  },
+};
 
 export default passController;
