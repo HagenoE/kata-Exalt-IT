@@ -57,6 +57,7 @@ const handleTokenError = (res) => {
 const errorHandler = (err, req, res) => {
   const { message } = err;
   const status = err.status ?? 500;
+
   if (err.name === 'CastError') {
     handleCastError(res, err);
   }

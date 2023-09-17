@@ -105,7 +105,7 @@ const authController = {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new AppError('No user found', 404));
+      return next(new AppError(404, 'No user found'));
     }
 
     const resetToken = user.createPasswordResetToken();
@@ -130,7 +130,7 @@ const authController = {
       user.passwordResetExpires = undefined;
 
       await user.save();
-      return next(new AppError('Send email in error. Try later', 500));
+      return next(new AppError(500, 'Send email in error. Try later'));
     }
   },
 
@@ -149,7 +149,7 @@ const authController = {
     const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: Date.now() } });
 
     if (!user) {
-      return next(new AppError('Wrong link. Try to reasking a reset link', 400));
+      return next(new AppError(400, 'Wrong link. Try to reasking a reset link'));
     }
 
     user.password = req.body.password;
@@ -162,7 +162,7 @@ const authController = {
 
       return generateTokenAndStoreUser(user, 201, res);
     } catch (error) {
-      return next(new AppError(error.message, 400));
+      return next(new AppError(400, error.message));
     }
   },
 
@@ -181,7 +181,7 @@ const authController = {
     const isCorrect = await currentUser.correctPassword(currentPassword, currentUser.password);
 
     if (!isCorrect) {
-      return next(new AppError('Wrong password', 401));
+      return next(new AppError(401, 'Wrong password'));
     }
     currentUser.password = newPassword;
     currentUser.passwordConfirm = newPasswordConfirm;
@@ -208,15 +208,15 @@ const authController = {
     }
 
     if (!token) {
-      return next(new AppError('You are not logged', 401));
+      return next(new AppError(401, 'You are not logged'));
     }
 
     const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
     const currentUser = await User.findById(decode.id);
-    if (!currentUser) return next(new AppError('Current user does not exist', 401));
+    if (!currentUser) return next(new AppError(401, 'Current user does not exist'));
 
     if (currentUser.changePasswordAfter(decode.iat)) {
-      return next(new AppError('New password generate. Please login again', 401));
+      return next(new AppError(401, 'New password generate. Please login again'));
     }
 
     req.user = currentUser;
@@ -230,15 +230,15 @@ const authController = {
       [, token] = header;
     }
     if (!token) {
-      return next(new AppError('You are not logged', 401));
+      return next(new AppError(401, 'You are not logged'));
     }
 
     const decode = jwt.verify(token, process.env.JWT_SECRET);
     const currentUser = await User.findById(decode.id);
-    if (!currentUser) return next(new AppError('Current user does not exist', 401));
+    if (!currentUser) return next(new AppError(401, 'Current user does not exist'));
 
     if (currentUser.role !== 'admin') {
-      return next(new AppError('You can not access ', 403));
+      return next(new AppError(403, 'You can not access'));
     }
     req.isAdmin = true;
     return next();

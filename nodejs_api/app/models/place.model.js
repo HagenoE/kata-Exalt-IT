@@ -8,22 +8,21 @@ const placeSchema = mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: [true, 'must have a phone number'],
     unique: true,
   },
-  passLevelRequire: {
+  passLevel: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Pass',
     required: [true, 'must have an adress'],
   },
-  ageRequire: {
+  age: {
     type: Number,
     required: [true, 'must have an age minimal'],
   },
   owner: {
-    // type: mongoose.Schema.Types.ObjectId,
-    // ref: 'User',
-    // required: [true, 'must have a owner'],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'must have a owner'],
   },
 });
 
