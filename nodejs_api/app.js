@@ -1,5 +1,6 @@
 import http from 'node:http';
 import mongoose from 'mongoose';
+
 import app from './server.js';
 import './app/utils/env.utils.js';
 

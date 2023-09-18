@@ -48,7 +48,7 @@ const passController = {
     const pass = await Pass.findById(id);
 
     if (!pass) {
-      return next(new AppError(404, 'No match found'));
+      return next(new AppError(404, 'No pass found'));
     }
 
     return res.status(200).json({ data: pass });
