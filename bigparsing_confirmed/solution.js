@@ -11,7 +11,7 @@ const dataPath = './data/input.json'
  * @return {string} The name associated with the ID, or 'Aucune donnée trouvée' if no match is found.
  */
 function bigparsing() {
-  const searchId = process.argv[2];
+  const [, , searchId] = process.argv;
 
   // Solution whitout memory limit  
   // const result = data.find((element) => element.id === Number(searchId));
@@ -29,7 +29,6 @@ function bigparsing() {
 
 
     if (value.id === Number(searchId)) {
-      console.log(value.name);
       isDataFound = true;
       stream.destroy(); // Kill the stream when one result match
     }
