@@ -21,4 +21,3 @@ placeRouter.route('*', (req, res, next) => {
 });
 
 export default placeRouter;
-// One endpoint to check if a given user can access a given public space

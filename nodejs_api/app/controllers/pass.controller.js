@@ -75,6 +75,15 @@ const passController = {
 
     return res.status(201).json({ data: updatedPass });
   },
+
+  /**
+   * Deletes a pass.
+   *
+   * @param {Object} req - The request object
+   * @param {Object} res - The response object
+   * @param {Function} next - The next middleware function
+   * @return {Number} The HTTP status code 204
+   */
   async deletePass(req, res, next) {
     const { id } = req.params;
     const pass = await Pass.findByIdAndRemove(id, req.body);

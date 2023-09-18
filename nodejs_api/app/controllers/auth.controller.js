@@ -51,6 +51,13 @@ const generateTokenAndStoreUser = (user, res, statusCode) => {
   );
 };
 
+/**
+ * Retrieves information from a token.
+ *
+ * @param {object} req - the request object
+ * @param {function} next - the next middleware function
+ * @return {object} the decoded token information
+ */
 export const getTokenInformation = (req, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -224,6 +231,15 @@ const authController = {
     req.user = currentUser;
     return next();
   },
+
+  /**
+   * Checks if the user making the request is an admin.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @param {Function} next - The next middleware function.
+   * @return {void}
+   */
   isAdmin: async (req, res, next) => {
     const decode = getTokenInformation(req, next);
 
@@ -240,6 +256,15 @@ const authController = {
 
     return next();
   },
+
+  /**
+   * Middleware function to check if the current user is the owner of the resource.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @param {Function} next - The next middleware function.
+   * @return {Function} The next middleware function.
+   */
   isOwner: async (req, res, next) => {
     const decode = getTokenInformation(req, next);
     let data;

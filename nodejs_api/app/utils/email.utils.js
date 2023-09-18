@@ -1,6 +1,16 @@
 import pkg from 'nodemailer';
 
 const { nodemailer } = pkg;
+
+/**
+ * Sends an email using nodemailer.
+ *
+ * @param {Object} options - The options for sending the email.
+ * @param {string} options.email - The recipient's email address.
+ * @param {string} options.subject - The subject of the email.
+ * @param {string} options.message - The body of the email.
+ * @return {Promise<void>} - A promise that resolves when the email is sent successfully.
+ */
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,

@@ -1,6 +1,11 @@
 import '../utils/env.utils.js';
 import { connexion } from './connection.js';
 
+/**
+ * Executes the import process for the passes collection.
+ *
+ * @return {Promise<void>} - A promise that resolves when the import process is completed.
+ */
 export async function passImportExecution() {
   const uri = process.env.DB_URI;
   let mongoClient;
