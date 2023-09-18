@@ -1,5 +1,7 @@
 import AppError from '../error/app.error.js';
 import User from '../models/user.model.js';
+import Place from '../models/place.model.js';
+import { getTokenInformation } from './auth.controller.js';
 
 const userController = {
   getAllUser: async (req, res) => {
@@ -46,6 +48,26 @@ const userController = {
     }
 
     return res.sendStatus(204);
+  },
+  placeCanAccess: async (req, res, next) => {
+    const decode = getTokenInformation(req, next);
+    const user = await User.findById(decode.id);
+    const places = await Place.find();
+
+    const placeAuthorize = places.map((place) => {
+      const isRightPlace = place.passLevelId.includes(user.passLevelId);
+      if (!isRightPlace) {
+        return false;
+      }
+
+      return place;
+    });
+
+    if (placeAuthorize.length === 0) {
+      return res.status(200).json({ message: 'No place found' });
+    }
+
+    return res.status(200).json({ data: placeAuthorize });
   },
 };
 

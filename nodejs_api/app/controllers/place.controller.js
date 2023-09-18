@@ -1,5 +1,7 @@
 import AppError from '../error/app.error.js';
 import Place from '../models/place.model.js';
+import User from '../models/user.model.js';
+import { getTokenInformation } from './auth.controller.js';
 
 const placeController = {
 
@@ -10,6 +12,7 @@ const placeController = {
   },
   addNewPlace: async (req, res) => {
     const newPlace = new Place(req.body);
+
     await newPlace.save();
 
     return res.status(201).json({ data: newPlace });
@@ -46,7 +49,25 @@ const placeController = {
 
     return res.sendStatus(204);
   },
+  authorizeForUser: async (req, res, next) => {
+    const { id } = req.params;
 
+    const place = await Place.findById(id);
+    if (!place) {
+      return next(new AppError(404, 'No place found'));
+    }
+
+    const decode = getTokenInformation(req, next);
+    const user = await User.findById(decode.id);
+
+    if (
+      !(place.passLevelId.includes(user.passLevelId))
+      || !(place.ageRequire <= user.age)
+    ) {
+      return res.status(200).json({ message: 'User could not have acces to this place' });
+    }
+    return res.status(200).json({ message: 'User could acces to this place' });
+  },
 };
 
 export default placeController;

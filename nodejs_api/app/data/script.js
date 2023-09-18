@@ -1,4 +1,4 @@
-import '../utils/env.utils.js'
+import '../utils/env.utils.js';
 import { connexion } from './connection.js';
 
 export async function passImportExecution() {
@@ -14,22 +14,21 @@ export async function passImportExecution() {
       {
         passLevel: 'Not vaccinated',
         createdAt: Date.now(),
-        updatedAt: null
+        updatedAt: null,
       },
       {
         passLevel: 'Recent case of covid',
         createdAt: Date.now(),
-        updatedAt: null
+        updatedAt: null,
       },
       {
         passLevel: 'Vaccinated',
         createdAt: Date.now(),
-        updatedAt: null
-      }
+        updatedAt: null,
+      },
     ];
 
     await collection.insertMany(passes);
-
   } finally {
     await mongoClient.close();
   }

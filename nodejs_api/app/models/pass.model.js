@@ -7,6 +7,11 @@ const passSchema = mongoose.Schema({
     required: [true, 'must have a pass level'],
     unique: true,
   },
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'must have a owner'],
+  },
   createdAt: {
     type: Date,
     default() {

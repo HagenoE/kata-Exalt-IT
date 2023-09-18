@@ -10,16 +10,16 @@ const placeSchema = mongoose.Schema({
     type: String,
     unique: true,
   },
-  passLevel: {
+  passLevelId: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Pass',
-    required: [true, 'must have an adress'],
+    required: [true, 'must have a pass level'],
   },
-  age: {
+  ageRequire: {
     type: Number,
     required: [true, 'must have an age minimal'],
   },
-  owner: {
+  ownerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'must have a owner'],

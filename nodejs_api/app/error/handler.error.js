@@ -44,6 +44,12 @@ const handleTokenError = (res) => {
   return res.status(401).json({ message });
 };
 
+const handleCastDuplicateDB = (res, err) => {
+  const value = err.keyValue.name || err.keyValue.email;
+  const message = `la valeur  ${value} existe deja.Veuillez en choisir une autre.`;
+  return res.status(401).json({ message });
+};
+
 /**
  * Handles errors that occur in the application.
  *
@@ -71,6 +77,10 @@ const errorHandler = (err, req, res) => {
 
   if (err.name === 'JsonWebTokenError') {
     handleTokenError(res);
+  }
+
+  if (err.code === 11000 || err.name === 'MongoServerError') {
+    handleCastDuplicateDB(res, err);
   }
 
   return res.status(status).json({ message });

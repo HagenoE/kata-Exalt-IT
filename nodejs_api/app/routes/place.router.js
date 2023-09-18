@@ -15,9 +15,10 @@ placeRouter.route('/:id')
   .get(errorWrapper(placeController.getOnePlace))
   .put(validator('body', placeUpdate), errorWrapper(placeController.updatePlace))
   .delete(errorWrapper(placeController.deletePlace));
-
+placeRouter.get('/:id/user', placeController.authorizeForUser);
 placeRouter.route('*', (req, res, next) => {
   next(new AppError(404, 'Not found '));
 });
 
 export default placeRouter;
+// One endpoint to check if a given user can access a given public space

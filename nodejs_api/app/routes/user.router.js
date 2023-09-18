@@ -22,9 +22,11 @@ userRouter.route('/')
   .get(authController.isAdmin, errorWapper(userController.getAllUser))
   .post(authController.isAdmin, validator('body', userCreate), errorWapper(userController.addUser));
 
+userRouter.get('/places', userController.placeCanAccess);
+
 userRouter.route('/:id')
-  .get(authController.isAdmin, errorWapper(userController.findOneUser))
-  .put(authController.isAdmin, validator('body', userUpdate), errorWapper(userController.updateUser))
+  .get(authController.isOwner, errorWapper(userController.findOneUser))
+  .put(authController.isOwner, validator('body', userUpdate), errorWapper(userController.updateUser))
   .delete(authController.isAdmin, errorWapper(userController.deleteUser));
 
 userRouter.route('*', (req, res, next) => {
@@ -32,12 +34,3 @@ userRouter.route('*', (req, res, next) => {
 });
 
 export default userRouter;
-
-// TODO
-/*
-route /user/:id/location => place authorize
-route pass/:id/location => place where the level is authorize
-Except for a place, a ressource should only be accessed by it's owner.
-One endpoint to check if a given user can access a given public space
- One endpoint to check which public spaces can access a given user
- */

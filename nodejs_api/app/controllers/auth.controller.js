@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import promisify from 'util';
 import User from '../models/user.model.js';
 import AppError from '../error/app.error.js';
 import sendEmail from '../utils/email.utils.js';
+import Pass from '../models/pass.model.js';
 
 /**
  * Generates a token using the provided id.
@@ -49,6 +49,20 @@ const generateTokenAndStoreUser = (user, res, statusCode) => {
         { user: userData },
     },
   );
+};
+
+export const getTokenInformation = (req, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    const header = req.headers.authorization.split(' ');
+    [, token] = header;
+  }
+  if (!token) {
+    return next(new AppError(401, 'You are not logged'));
+  }
+
+  const decode = jwt.verify(token, process.env.JWT_SECRET);
+  return decode;
 };
 
 const authController = {
@@ -199,19 +213,7 @@ const authController = {
    * @return {Function} The next middleware function.
    */
   isLogged: async (req, res, next) => {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      const header = req.headers.authorization.split(' ');
-      // eslint-disable-next-line prefer-destructuring
-      [, token] = header;
-    }
-
-    if (!token) {
-      return next(new AppError(401, 'You are not logged'));
-    }
-
-    const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const decode = getTokenInformation(req, next);
     const currentUser = await User.findById(decode.id);
     if (!currentUser) return next(new AppError(401, 'Current user does not exist'));
 
@@ -223,27 +225,51 @@ const authController = {
     return next();
   },
   isAdmin: async (req, res, next) => {
-    let token;
+    const decode = getTokenInformation(req, next);
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      const header = req.headers.authorization.split(' ');
-      [, token] = header;
-    }
-    if (!token) {
+    if (!decode) {
       return next(new AppError(401, 'You are not logged'));
     }
 
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
     const currentUser = await User.findById(decode.id);
     if (!currentUser) return next(new AppError(401, 'Current user does not exist'));
 
     if (currentUser.role !== 'admin') {
       return next(new AppError(403, 'You can not access'));
     }
-    req.isAdmin = true;
+
     return next();
   },
+  isOwner: async (req, res, next) => {
+    const decode = getTokenInformation(req, next);
+    let data;
+    const [, model] = req.originalUrl.trim().split('/');
 
+    if (!decode) {
+      return next(new AppError(401, 'You are not logged'));
+    }
+
+    const currentUser = await User.findById(decode.id);
+    if (!currentUser) return next(new AppError(401, 'Current user is not exist'));
+
+    switch (model) {
+      case 'user':
+        data = await User.findById(decode.id);
+        if ((currentUser.id !== data.id)) {
+          return next(new AppError(401, 'Current user is not the owner'));
+        }
+        break;
+      case 'pass':
+        data = await Pass.findById(decode.passLevelId);
+        if ((currentUser.id !== data.ownerId)) {
+          return next(new AppError(401, 'Current user is not the owner'));
+        }
+        break;
+      default:
+        break;
+    }
+    return next();
+  },
 };
 
 export default authController;
